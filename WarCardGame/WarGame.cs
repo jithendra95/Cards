@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using CardGame;
 using CardPack;
 
 namespace WarCardGame;
@@ -7,11 +8,13 @@ public class WarGame : IGame
 {
     public IReadOnlyCollection<IPlayer> Players { get; init; }
     public ICardPack CardPack { get; init; }
+    public PlayingTable PlayingTable { get; init; }
 
     public WarGame(ICardPack cardPack, IReadOnlyCollection<IPlayer> players)
     {
         CardPack = cardPack;
         Players = players;
+        PlayingTable = new PlayingTable();
     }
 
     public void Play()
@@ -45,18 +48,18 @@ public class WarGame : IGame
 
     private void PlayRound()
     {
-        var cardsInPlay = new List<(ICard card, IPlayer player)>();
+        
         foreach (var player in Players)
         {
             if (!player.HasCards()) continue;
             var card = player.PlayCard();
-            cardsInPlay.Add((card, player));
+            PlayingTable.ReceiveCard(card, player);
 
             Console.WriteLine(
                 $"Player {player.Name} ({player.CardsInHand.CardsInDeck() + player.CardsWon.CardsInDeck()}) played {card.GetCardInfo()}");
         }
 
-        FindWinner(cardsInPlay, null);
+        //FindWinner(cardsInPlay, null);
 
         // var totalCards = 0;
         // foreach (var player in Players)
@@ -72,77 +75,7 @@ public class WarGame : IGame
         // }
     }
 
-    private void FindWinner(List<(ICard card, IPlayer player)> cardsInPlay, List<ICard>? winningPot)
-    {
-        if (IsThereAWar(cardsInPlay.Select(x => x.card).ToList()))
-        {
-            Console.WriteLine("There is a war!");
-            ResolveWar(cardsInPlay, winningPot);
-            return;
-        }
-
-        var winner = GetWinner(cardsInPlay);
-        winner.AddWonCards(cardsInPlay.Select(x => x.card).ToList());
-        if (winningPot != null)
-            winner.AddWonCards(winningPot);
-
-        Console.WriteLine($"Winner {winner.Name}  \n");
-    }
-
-    private void ResolveWar(List<(ICard card, IPlayer player)> cardsInPlayByPlayer, List<ICard>? winningPot)
-    {
-        var warValue = cardsInPlayByPlayer.GroupBy(x => x.card.Value)
-            .Where(x => x.Count() > 1)
-            .Select(i => i.Key)
-            .First();
-        Console.WriteLine($" War on {warValue}");
-        var warPlayers = cardsInPlayByPlayer.Where(x => x.card.Value == warValue).Select(x => x.player).ToList();
-        var allWinnings = cardsInPlayByPlayer.Select(x => x.card).ToList();
-        if(winningPot != null)
-            allWinnings.AddRange(winningPot);
-        
-        var newCardsInPlay = new List<(ICard card, IPlayer player)>();
-
-        foreach (var player in warPlayers)
-        {
-            var cardOfPlayer = new List<ICard>();
-            for (int i = 0; i < 4; i++)
-            {
-                if (player.HasCards())
-                {
-                    cardOfPlayer.Add(player.PlayCard());
-                }
-            }
-
-            if (cardOfPlayer.Count == 0) continue;
-            var lastPlayedCard = cardOfPlayer.Last();
-            cardOfPlayer.Remove(
-                lastPlayedCard); // Remove the last card because it will added to the winnings in FindWinner.
-            newCardsInPlay.Add((lastPlayedCard, player));
-            allWinnings.AddRange(cardOfPlayer);
-        }
-
-        FindWinner(newCardsInPlay, allWinnings);
-    }
-
-    private bool IsThereAWar(List<ICard> cardsInPlay)
-    {
-        return cardsInPlay.GroupBy(x => x.Value).Any(x => x.Count() > 1);
-    }
-
-    private IPlayer GetWinner(List<(ICard card, IPlayer player)> cardsInPlay)
-    {
-        var winner = cardsInPlay[0];
-        foreach (var (card, player) in cardsInPlay)
-        {
-            if (card.Value > winner.card.Value)
-            {
-                winner = (card, player);
-            }
-        }
-
-        return winner.player;
-    }
+    
 
     // private void PrintPlayerCards(IPlayer player)
     // {

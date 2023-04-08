@@ -1,6 +1,6 @@
 ﻿using CardPack;
 
-namespace WarCardGame;
+namespace CardGame;
 
 public interface IPlayer
 {

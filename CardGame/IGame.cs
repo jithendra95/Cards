@@ -1,6 +1,7 @@
 ﻿using CardPack;
+using WarCardGame;
 
-namespace WarCardGame;
+namespace CardGame;
 
 public interface IGame
 {

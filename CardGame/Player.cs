@@ -1,4 +1,5 @@
-﻿using CardPack;
+﻿using CardGame;
+using CardPack;
 
 namespace WarCardGame;
 
@@ -13,8 +14,8 @@ public class Player : IPlayer
         CardsWon = new CardPack.CardPack($"{name} Cards Won");
     }
 
-    public string Name { get; init; }
-    public ICardPack CardsInHand { get; init; }
+    public string Name { get; }
+    public ICardPack CardsInHand { get; }
     public ICardPack CardsWon { get; init; }
     public int Score { get; set; }
 

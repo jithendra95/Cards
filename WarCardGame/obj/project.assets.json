@@ -2,6 +2,19 @@
   "version": 3,
   "targets": {
     "net6.0": {
+      "CardGame/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "CardPack": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/CardGame.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/CardGame.dll": {}
+        }
+      },
       "CardPack/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
@@ -15,6 +28,11 @@
     }
   },
   "libraries": {
+    "CardGame/1.0.0": {
+      "type": "project",
+      "path": "../CardGame/CardGame.csproj",
+      "msbuildProject": "../CardGame/CardGame.csproj"
+    },
     "CardPack/1.0.0": {
       "type": "project",
       "path": "../CardPack/CardPack.csproj",
@@ -23,6 +41,7 @@
   },
   "projectFileDependencyGroups": {
     "net6.0": [
+      "CardGame >= 1.0.0",
       "CardPack >= 1.0.0"
     ]
   },
@@ -58,6 +77,9 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
+            "C:\\Development\\redgate\\Cards\\CardGame\\CardGame.csproj": {
+              "projectPath": "C:\\Development\\redgate\\Cards\\CardGame\\CardGame.csproj"
+            },
             "C:\\Development\\redgate\\Cards\\CardPack\\CardPack.csproj": {
               "projectPath": "C:\\Development\\redgate\\Cards\\CardPack\\CardPack.csproj"
             }
