@@ -61,4 +61,9 @@ public class Player : IPlayer
     {
         return CardsInHand.HasCards() || CardsWon.HasCards();
     }
+
+    public int NumberOfCards()
+    {
+        return CardsInHand.CardsInDeck() + CardsWon.CardsInDeck();
+    }
 }

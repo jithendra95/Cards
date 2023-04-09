@@ -13,7 +13,7 @@ public class PlayingTable
         cardsInPlayByPlayer.Add((card, player));
     }
 
-    public IPlayer FindWinner()
+    public IPlayer? FindWinner()
     {
         if (IsThereAWar())
         {
@@ -29,7 +29,9 @@ public class PlayingTable
                 winner = (card, player);
             }
         }
+
         winningPot.AddRange(cardsInPlayByPlayer.Select(x => x.card));
+        cardsInPlayByPlayer.Clear();
         return winner.player;
 
         // winner.AddWonCards(cardsInPlay.Select(x => x.card).ToList());
@@ -41,11 +43,14 @@ public class PlayingTable
 
     public List<ICard> GetWinningCards()
     {
-        return winningPot;
+        var winnings = new List<ICard>();
+        winnings.AddRange(winningPot);
+        winningPot.Clear();
+        return winnings;
     }
 
 
-    private IPlayer ResolveWar()
+    private IPlayer? ResolveWar()
     {
         var warValue = cardsInPlayByPlayer.GroupBy(x => x.card.Value)
             .Where(x => x.Count() > 1)
@@ -56,14 +61,25 @@ public class PlayingTable
         winningPot.AddRange(cardsInPlayByPlayer.Select(x => x.card).ToList());
         cardsInPlayByPlayer.Clear();
 
-        foreach (var player in warPlayers)
+        var playersEligible = warPlayers.Where(x => x.NumberOfCards() > 3).ToList();
+        
+        switch (playersEligible.Count())
         {
-            
+            case 0:
+                Console.WriteLine("No winner");
+                return null;
+            case 1:
+            {
+                var winner = playersEligible.First();
+                Console.WriteLine($"Winner {winner.Name}  \n");
+                return winner;
+            }
         }
+
         foreach (var player in warPlayers)
         {
             var cardsOfPlayer = new List<ICard>();
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 if (player.HasCards())
                 {

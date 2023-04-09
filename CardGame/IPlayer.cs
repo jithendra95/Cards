@@ -14,4 +14,5 @@ public interface IPlayer
     public ICard PlayCard(Guid id);
     public ICard PlayCard();
     public bool HasCards();
+    public int NumberOfCards();
 }
