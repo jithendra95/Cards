@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using CardGame;
+﻿using CardGame;
 using CardPack;
 
 namespace WarCardGame;
@@ -7,19 +6,26 @@ namespace WarCardGame;
 public class WarGame : IGame
 {
     public IReadOnlyCollection<IPlayer> Players { get; init; }
-    public ICardPack CardPack { get; init; }
-    public PlayingTable PlayingTable { get; init; }
+    private readonly ICardPack _cardPack;
+    private readonly PlayingTable _playingTable;
 
-    public WarGame(ICardPack cardPack, IReadOnlyCollection<IPlayer> players)
+    public WarGame( IReadOnlyCollection<IPlayer> players)
     {
-        CardPack = cardPack;
+        _cardPack = new CardPack.CardPack("War Deck");
+        _cardPack.InitializeCardPack();
+
+        for (var i = 0; i < 10; i++)
+        {
+            _cardPack.Shuffle();
+        }
+        
         Players = players;
-        PlayingTable = new PlayingTable();
+        _playingTable = new PlayingTable();
     }
 
     public void Play()
     {
-        CardPack.Shuffle();
+        _cardPack.Shuffle();
 
         DealCards();
 
@@ -31,12 +37,12 @@ public class WarGame : IGame
 
     private void DealCards()
     {
-        while (CardPack.HasCards())
+        while (_cardPack.HasCards())
         {
             foreach (var player in Players)
             {
-                if (!CardPack.HasCards()) break;
-                player.AddCardToHand(CardPack.DrawCard());
+                if (!_cardPack.HasCards()) break;
+                player.AddCardToHand(_cardPack.DrawCard());
             }
         }
 
@@ -53,14 +59,14 @@ public class WarGame : IGame
         {
             if (!player.HasCards()) continue;
             var card = player.PlayCard();
-            PlayingTable.ReceiveCard(card, player);
+            _playingTable.ReceiveCard(card, player);
 
             Console.WriteLine(
                 $"Player {player.Name} ({player.CardsInHand.CardsInDeck() + player.CardsWon.CardsInDeck()}) played {card.GetCardInfo()}");
         }
 
-        var winner = PlayingTable.FindWinner();
-        winner?.AddWonCards(PlayingTable.GetWinningCards());
+        var winner = _playingTable.FindWinner();
+        winner?.AddWonCards(_playingTable.GetWinningCards());
 
     }
 }
